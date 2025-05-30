@@ -1,0 +1,1 @@
+CREATE DATABASE school_db_dev;

@@ -30,21 +30,14 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-
-        if (
-            extra_fields.get("is_staff") is not True
-            or extra_fields.get("is_superuser") is not True
-        ):
-            raise ValueError("Superuser must have is_staff=True and is_superuser=True")
-
         return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
-    roles = models.ManyToManyField(Role)
+    roles = models.ManyToManyField(Role, related_name='users')
+    is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -53,3 +46,9 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+    
+    def get_all_permissions(self):
+        perms = set()
+        for role in self.roles.prefetch_related("permissions", "parents__permissions"):
+            perms.update(role.get_all_permissions())
+        return set(p.code for p in perms)

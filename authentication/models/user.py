@@ -36,7 +36,7 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
-    roles = models.ManyToManyField(Role, related_name='users')
+    roles = models.ManyToManyField(Role, related_name="users")
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
@@ -46,7 +46,7 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
-    
+
     def get_all_permissions(self):
         perms = set()
         for role in self.roles.prefetch_related("permissions", "parents__permissions"):

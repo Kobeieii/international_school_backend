@@ -3,6 +3,22 @@ from .base import *
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [*CSRF_TRUSTED_ORIGINS]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+CORS_ALLOW_HEADERS = ["content-type", "authorization", "x-requested-with", "mode"]
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",

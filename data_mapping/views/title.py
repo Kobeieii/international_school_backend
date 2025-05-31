@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import filters
 from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
 from data_mapping.models import Title, Department, DataSubjectType
@@ -11,6 +12,21 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.prefetch_related("department", "data_subject_types").all()
     serializer_class = TitleSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "name",
+        "description",
+        "department__name",
+        "data_subject_types__name",
+        "$name",
+        "$description",
+        "$department__name",
+        "$data_subject_types__name",
+        "@name",
+        "@description",
+        "@department__name",
+        "@data_subject_types__name",
+    ]
 
     def get_queryset(self):
         return self.queryset.filter(deleted_at__isnull=True)
@@ -33,7 +49,9 @@ class TitleViewSet(viewsets.ModelViewSet):
                 for data in serializer.validated_data:
                     department_id = department_map.get(data.get("department"))
                     if not department_id:
-                        raise ValueError(f"Invalid department: {data.get('department')}")
+                        raise ValueError(
+                            f"Invalid department: {data.get('department')}"
+                        )
 
                     data_subject_type_ids = [
                         data_subject_types_map[ds_type.strip()]
@@ -48,10 +66,12 @@ class TitleViewSet(viewsets.ModelViewSet):
                     )
                     title.data_subject_types.set(data_subject_type_ids)
 
-            return Response({"detail": "Import successful"}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"detail": "Import successful"}, status=status.HTTP_201_CREATED
+            )
 
         except Exception as e:
             return Response(
                 {"detail": f"Import failed: {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )

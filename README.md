@@ -17,8 +17,8 @@ This Django backend project uses PostgreSQL as the database and Docker Compose t
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/Kobeieii/international_school_backend.git
+cd international_school_backend
 ```
 
 ### 2. Setup environment variables
@@ -80,7 +80,7 @@ DB_HOST=localhost
 DB_PORT=5432
 ```
 
-Example Django `settings.py`:
+Example Django `settings/dev.py`:
 
 ```python
 import os
